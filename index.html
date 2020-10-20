@@ -1,0 +1,591 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>审核报告</title>
+<style>
+  div > header h1 {
+    text-align: center;
+  }
+  .report_info {
+    display: flex;
+    height: 210px;
+    padding: 20px;
+  }
+  .info_left {
+    width: 30%;
+  }
+  .info_right {
+    flex: 1;
+  }
+  .score {
+    padding-left: 10px;
+  }
+  .info_table table {
+    border-collapse:collapse;
+    border:none;
+  }
+  .info_table table tr td {
+    padding: 10px 0 10px 15px;
+    font-size: 12px;
+    text-align: left;
+    color: #515a6e;
+    border: 1px solid #e8e8e8;
+  }
+  .info_table table tr td.title {
+    width: 100px;
+    background: #f8f8f9;
+  }
+  .info_table table tr td.content {
+    width: 222px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .clickArea {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .clickArea > div {
+    width: 25%;
+    padding: 10px 15px;
+  }
+  .clickArea > div > div {
+    width: 22%;
+    height: 97px;
+    display: flex;
+    border-radius: 4px;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .clickArea > div > div .clickArea_right {
+    margin-left: 30px;
+    height: 50px;
+  }
+
+  .clickArea > div > div .clickArea_left {
+    padding-left: 55px;
+  }
+
+  .clickArea > div > div .clickArea_right p {
+    margin: 0 0 8px 0;
+  }
+
+  .clickArea > div div.danger {
+    width: 100%;
+    background-color: rgba(224, 32, 32, 0.1);
+    cursor: pointer;
+  }
+  .clickArea > div div.medium {
+    width: 100%;
+    background-color: rgba(245, 124, 0, 0.1);
+    cursor: pointer;
+  }
+  .clickArea > div div.info {
+    width: 100%;
+    background-color: rgba(71, 167, 240, 0.1);
+    cursor: pointer;
+  }
+  .clickArea > div  div.normal {
+    width: 100%;
+    background-color: rgba(76, 175, 80, 0.1);
+  }
+  .chart_area {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border: 2px solid #ccc;
+  }
+  .chart_border_top_none {
+    border-top: none;
+  }
+  .click_border {
+    border: 2px solid #ccc;
+    border-bottom: none;
+  }
+  .click_border_show {
+    border-bottom: 2px solid #ccc;
+  }
+  .chart_area > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 380px;
+    border: 1px solid #ccc;
+    width: 28%;
+    padding: 15px;
+  }
+  .chart_area > div > div {
+    flex: 1;
+  }
+  .chart_area > div header {
+    padding: 15px;
+  }
+  .chart_area > div header .title {
+    font-size: 14px;
+    color: rgb(0, 0, 0);
+    position: relative;
+  }
+  .table_area {
+    padding: 0 10px 10px 10px;
+    margin-top: 20px;
+    width: 98.5%;
+    border: 2px solid #ccc;
+  }
+  .table_area > div > table {
+    border-collapse:collapse;
+  }
+  .table_area > div > table tr {
+    border: 1px solid #ccc;
+  }
+  .table_area > div > table tr:nth-of-type(1) td{
+    font-weight: bold;
+    text-align: center;
+  }
+  .table_area > div > table tr:nth-of-type(3) td .table_one tr td {
+    border: 1px solid #ccc;
+  }
+  .table_area > div > table tr:nth-of-type(3) td .table_one tr td:nth-of-type(1) {
+    text-align: left;
+    width: 100px;
+  }
+
+  .table_area > div > table tr:nth-of-type(3) td .table_two tr {
+    border: 1px solid #ccc;
+  }
+
+  .table_area > div > table tr td {
+    padding: 15px 0 15px 15px;
+    font-size: 12px;
+    text-align: center;
+    color: #515a6e;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .danger_item {
+    float: left;
+    margin: 3px;
+    width: 82px;
+    cursor: pointer;
+    padding: 3px 5px;
+    color: #ffa39e;
+    background: #fff1f0;
+    border-radius: 5px;
+    border: 1px solid #ffa39e;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .info_item {
+    cursor: pointer;
+    float: left;
+    margin: 3px;
+    width: 82px;
+    padding: 3px 5px;
+    color: #1890ff;
+    background: #e6f7ff;
+    border-radius: 5px;
+    border: 1px solid #91d5ff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .middle_item {
+    cursor: pointer;
+    float: left;
+    margin: 3px;
+    width: 82px;
+    padding: 3px 5px;
+    color: #fa8c16;
+    background: #fff7e6;
+    border-radius: 5px;
+    border: 1px solid #ffd591;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .open {
+    display: none;
+  }
+  .close {
+    display: inline-block;
+  }
+  .open_img {
+    display: none;
+  }
+  .close_img {
+    display: inline-block;
+  }
+  .display_tr {
+    display: none;
+  }
+
+  .tr_open {
+    display: table-row !important;
+  }
+
+  .prev, .next {
+    display: inline-block;
+    margin: 0 10px;
+    color: #ccc;
+    cursor: pointer;
+  }
+  .page_item {
+    display: inline-block;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+  .page_item_active {
+    color: #2D8CF2;
+  }
+</style>
+</head>
+  <div style="padding: 0 15px 15px 15px;">
+    <header>
+      <h1></h1>
+    </header>
+    <div class="report_info">
+      <div class="info_left">
+        <h3>审核得分</h3>
+        <div class="score">
+          <span class="first_span" style="color: rgb(120, 176, 239);font-size: 64px;"></span>&emsp;<span style="color: rgb(153, 153, 153);font-size: 18px;">分</span>
+        </div>
+      </div>
+      <div class="info_right">
+        <h3>基本信息</h3>
+        <div class="info_table">
+<!--          <table style="width: 100%;";-->
+<!--                 cellspacing="0"-->
+<!--                 cellpadding="0">-->
+<!--            <tr>-->
+<!--              <td class="title">数据库名称</td>-->
+<!--              <td class="content">rac11g(192.168.3.203:1525/RACDB_Pr...</td>-->
+<!--              <td class="title">数据库类型</td>-->
+<!--              <td class="content">oracle</td>-->
+<!--              <td class="title">任务名称</td>-->
+<!--              <td class="content">rac11g-2020091315</td>-->
+<!--            </tr>-->
+<!--            <tr>-->
+<!--              <td class="title">审核开始时间</td>-->
+<!--              <td class="content"></td>-->
+<!--              <td class="title">审核结束时间</td>-->
+<!--              <td class="content"></td>-->
+<!--              <td class="title">执行耗时</td>-->
+<!--              <td class="content"></td>-->
+<!--            </tr>-->
+<!--            <tr>-->
+<!--              <td class="title">开始时间</td>-->
+<!--              <td class="content">2020-09-17 09:30:00</td>-->
+<!--              <td class="title">Schema</td>-->
+<!--              <td class="content" colspan="3">MONITOR</td>-->
+<!--            </tr>-->
+<!--          </table>-->
+        </div>
+      </div>
+    </div>
+    <div class="clickArea">
+      <div class="click_danger">
+        <div class="danger">
+          <div class="clickArea_left">
+            <img width="50" src="./images/danger.png"/>
+          </div>
+          <div class="clickArea_right">
+            <p style="color: rgba(0, 0, 0, 0.35);font-size: 12px;">严重风险项</p>
+            <span class="nums" style="color: rgb(102, 102, 102);font-size: 20px;">100</span>&nbsp;<span style="font-size: 14px;color: rgba(0, 0, 0, 0.35);">条</span>
+          </div>
+        </div>
+      </div>
+      <div class="click_middle">
+        <div class="medium">
+          <div class="clickArea_left">
+            <img width="50" src="./images/middle.png"/>
+          </div>
+          <div class="clickArea_right">
+            <p style="color: rgba(0, 0, 0, 0.35);font-size: 12px;">警告风险项</p>
+            <span class="nums" style="color: rgb(102, 102, 102);font-size: 20px;">4392</span>&nbsp;<span style="font-size: 14px;color: rgba(0, 0, 0, 0.35);">条</span>
+          </div>
+        </div>
+      </div>
+      <div class="click_info">
+        <div class="info">
+          <div class="clickArea_left">
+            <img width="50" src="./images/low.png"/>
+          </div>
+          <div class="clickArea_right">
+            <p style="color: rgba(0, 0, 0, 0.35);font-size: 12px;">提示风险项</p>
+            <span class="nums" style="color: rgb(102, 102, 102);font-size: 20px;">2043</span>&nbsp;<span style="font-size: 14px;color: rgba(0, 0, 0, 0.35);">条</span>
+          </div>
+        </div>
+      </div>
+      <div class="click_succ">
+        <div class="normal">
+          <div class="clickArea_left">
+            <img width="50" src="./images/success.png"/>
+          </div>
+          <div class="clickArea_right">
+            <p style="color: rgba(0, 0, 0, 0.35);font-size: 12px;">正常规则总数</p>
+            <span class="nums" style="color: rgb(102, 102, 102);font-size: 20px;">3096</span>&nbsp;<span style="font-size: 14px;color: rgba(0, 0, 0, 0.35);">条</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chart_area">
+      <div id="rule_chart">
+        <header>
+          <div class="title">
+            高危规则命中
+            <div style="position: absolute;right: 0;top: 0;cursor: pointer;">
+              <img width="20" src="./images/open.png"/>
+            </div>
+          </div>
+          <h2 class="risk_nums" style="display: inline-block;margin: 10px 0 0 0;">4</h2>&nbsp;<span style="font-size: 14px;color: rgb(153, 153, 153)">次</span>
+        </header>
+        <div id="rule_content">
+        </div>
+      </div>
+      <div id="sql_chart">
+        <header>
+          <div class="title">
+            <span>SQL评分</span><span style="display: inline-block;margin-left: 35%;">SQL数量</span>
+          </div>
+          <h2 class="sql_score" style="display: inline-block;margin: 10px 0 0 0;">92</h2>&nbsp;<span style="font-size: 14px;color: rgb(153, 153, 153)">分</span>
+          <h2 class="sql_problem" style="display: inline-block;margin: 10px 0 0 36%;">1</h2>&nbsp;/<span class="sql_total" style="font-size: 14px;color: rgb(153, 153, 153)">24</span>
+        </header>
+        <div id="sql_content">
+        </div>
+      </div>
+      <div id="object_chart">
+        <header>
+          <div class="title">
+            <span>对象评分</span><span style="display: inline-block;margin-left: 35%;">对象数量</span>
+          </div>
+          <h2 class="object_score" style="display: inline-block;margin: 10px 0 0 0;">88.77</h2>&nbsp;<span style="font-size: 14px;color: rgb(153, 153, 153)">分</span>
+          <h2 class="object_nums" style="display: inline-block;margin: 10px 0 0 26%;">4785</h2>
+        </header>
+        <div id="obj_content">
+        </div>
+      </div>
+    </div>
+    <div class="table_area">
+      <header>
+        <h4>风险项分布</h4>
+      </header>
+      <div>
+        <table
+                class="bottom_table"
+                style="width: 100%;"
+                cellspacing="0"
+                cellpadding="0">
+<!--          <tr style="background: #f8f8f9;">-->
+<!--            <td width="60">序号</td>-->
+<!--            <td width="300">风险项名称</td>-->
+<!--            <td width="140">规则类别</td>-->
+<!--            <td width="640">问题描述</td>-->
+<!--            <td width="100">命中个数</td>-->
+<!--            <td width="100">影响SQL占比</td>-->
+<!--          </tr>-->
+<!--          <tr>-->
+<!--            <td>1</td>-->
+<!--            <td class="click_td" style="text-align: left;cursor: pointer;"><img class="close" src="./images/icon_close.png" width="10"/><img class="open" src="./images/icon_open.png" width="10"/> <span style="color: red">[严重风险]</span> SQL_SELECT_ANY_ADV2</td>-->
+<!--            <td>SQL</td>-->
+<!--            <td>全字段查询且解析后超过20列</td>-->
+<!--            <td>1/20</td>-->
+<!--            <td>5%</td>-->
+<!--          </tr>-->
+<!--          <tr class="display_tr">-->
+<!--            <td colspan="6" style="width: 100%;padding: 18px 35px;">-->
+<!--              <table class="table_one" style="width: 100%;border-collapse:collapse;">-->
+<!--                <tr>-->
+<!--                  <td style="font-weight: normal;">问题描述</td>-->
+<!--                  <td style="font-weight: normal;">全字段查询且解析后超过20列</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td>解决建议</td>-->
+<!--                  <td>排查返回结果集是否需要使用这些字段</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td>wiki链接</td>-->
+<!--                  <td>-->
+<!--                    <a style="color: rgb(0, 145, 255);cursor: pointer;">SQL_SELECT_ANY_ADV2</a>-->
+<!--                  </td>-->
+<!--                </tr>-->
+<!--              </table>-->
+<!--              <h3>SQL列表</h3>-->
+<!--              <table class="table_two" style="width: 100%;border-collapse:collapse;"-->
+<!--              cellspacing="0"-->
+<!--              cellpadding="0">-->
+<!--                <tr>-->
+<!--                  <td>SQL_ID</td>-->
+<!--                  <td>首次审核时间</td>-->
+<!--                  <td>Schema</td>-->
+<!--                  <td>SQL文本</td>-->
+<!--                  <td width="360">违反规则</td>-->
+<!--                  <td>审核评分</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">76c5c6m16z83u</a></td>-->
+<!--                  <td width="150">2020-10-16 11:57:34</td>-->
+<!--                  <td width="180">TEST</td>-->
+<!--                  <td><div style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">SELECT c.*,c.TABLE_NAME as OBJECT_NAME FR111111111111111111111</div></td>-->
+<!--                  <td style="width: 360px;">-->
+<!--                    <div class="danger_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="danger_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="middle_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="middle_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                  </td>-->
+<!--                  <td width="100">50</td>-->
+<!--                </tr>-->
+<!--              </table>-->
+<!--              <div style="margin-top: 10px;width: 100%;display: flex;justify-content: flex-end;">-->
+<!--                <div>-->
+<!--                  <span>共 10 条</span>-->
+<!--                  <span class="prev">&lt;</span>-->
+<!--                  <span class="page_item page_item_active">1</span>-->
+<!--                  <span class="page_item">2</span>-->
+<!--                  <span class="page_item">3</span>-->
+<!--                  <span class="next">&gt;</span>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </td>-->
+<!--          </tr>-->
+<!--          <tr>-->
+<!--            <td>2</td>-->
+<!--            <td class="click_td" style="text-align: left;cursor: pointer;"><img class="close" src="./images/icon_close.png" width="10"/><img class="open" src="./images/icon_open.png" width="10"/> <span style="color: red">[严重风险]</span> SQL_SELECT_ANY_ADV2</td>-->
+<!--            <td>SQL</td>-->
+<!--            <td>全字段查询且解析后超过20列</td>-->
+<!--            <td>1/20</td>-->
+<!--            <td>5%</td>-->
+<!--          </tr>-->
+<!--          <tr class="display_tr">-->
+<!--            <td colspan="6" style="width: 100%;padding: 18px 35px;">-->
+<!--              <table class="table_one" style="width: 100%;border-collapse:collapse;">-->
+<!--                <tr>-->
+<!--                  <td style="font-weight: normal;">问题描述</td>-->
+<!--                  <td style="font-weight: normal;">全字段查询且解析后超过20列</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td>解决建议</td>-->
+<!--                  <td>排查返回结果集是否需要使用这些字段</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td>wiki链接</td>-->
+<!--                  <td>-->
+<!--                    <a style="color: rgb(0, 145, 255);cursor: pointer;">SQL_SELECT_ANY_ADV2</a>-->
+<!--                  </td>-->
+<!--                </tr>-->
+<!--              </table>-->
+<!--              <h3>SQL列表</h3>-->
+<!--              <table class="table_two" style="width: 100%;border-collapse:collapse;"-->
+<!--                     cellspacing="0"-->
+<!--                     cellpadding="0">-->
+<!--                <tr>-->
+<!--                  <td>SQL_ID</td>-->
+<!--                  <td>首次审核时间</td>-->
+<!--                  <td>Schema</td>-->
+<!--                  <td>SQL文本</td>-->
+<!--                  <td width="360">违反规则</td>-->
+<!--                  <td>审核评分</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">76c5c6m16z83u</a></td>-->
+<!--                  <td width="150">2020-10-16 11:57:34</td>-->
+<!--                  <td width="180">TEST</td>-->
+<!--                  <td><div style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">SELECT c.*,c.TABLE_NAME as OBJECT_NAME FR111111111111111111111</div></td>-->
+<!--                  <td style="width: 360px;">-->
+<!--                    <div class="danger_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="danger_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="middle_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="middle_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                  </td>-->
+<!--                  <td width="100">50</td>-->
+<!--                </tr>-->
+<!--              </table>-->
+<!--            </td>-->
+<!--          </tr>-->
+<!--          <tr>-->
+<!--            <td>3</td>-->
+<!--            <td class="click_td" style="text-align: left;cursor: pointer;"><img class="close" src="./images/icon_close.png" width="10"/><img class="open" src="./images/icon_open.png" width="10"/> <span style="color: red">[严重风险]</span> SQL_SELECT_ANY_ADV2</td>-->
+<!--            <td>SQL</td>-->
+<!--            <td>全字段查询且解析后超过20列</td>-->
+<!--            <td>1/20</td>-->
+<!--            <td>5%</td>-->
+<!--          </tr>-->
+<!--          <tr class="display_tr">-->
+<!--            <td colspan="6" style="width: 100%;padding: 18px 35px;">-->
+<!--              <table class="table_one" style="width: 100%;border-collapse:collapse;">-->
+<!--                <tr>-->
+<!--                  <td style="font-weight: normal;">问题描述</td>-->
+<!--                  <td style="font-weight: normal;">全字段查询且解析后超过20列</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td>解决建议</td>-->
+<!--                  <td>排查返回结果集是否需要使用这些字段</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td>wiki链接</td>-->
+<!--                  <td>-->
+<!--                    <a style="color: rgb(0, 145, 255);cursor: pointer;">SQL_SELECT_ANY_ADV2</a>-->
+<!--                  </td>-->
+<!--                </tr>-->
+<!--              </table>-->
+<!--              <h3>SQL列表</h3>-->
+<!--              <table class="table_two" style="width: 100%;border-collapse:collapse;"-->
+<!--                     cellspacing="0"-->
+<!--                     cellpadding="0">-->
+<!--                <tr>-->
+<!--                  <td>SQL_ID</td>-->
+<!--                  <td>首次审核时间</td>-->
+<!--                  <td>Schema</td>-->
+<!--                  <td>SQL文本</td>-->
+<!--                  <td width="360">违反规则</td>-->
+<!--                  <td>审核评分</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">76c5c6m16z83u</a></td>-->
+<!--                  <td width="150">2020-10-16 11:57:34</td>-->
+<!--                  <td width="180">TEST</td>-->
+<!--                  <td><div style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">SELECT c.*,c.TABLE_NAME as OBJECT_NAME FR111111111111111111111</div></td>-->
+<!--                  <td style="width: 360px;">-->
+<!--                    <div class="danger_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="danger_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="middle_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="middle_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                    <div class="info_item">SQL_SELECsssssssssssssssssssssssss</div>-->
+<!--                  </td>-->
+<!--                  <td width="100">50</td>-->
+<!--                </tr>-->
+<!--              </table>-->
+<!--            </td>-->
+<!--          </tr>-->
+        </table>
+      </div>
+    </div>
+  </div>
+<body>
+<script src="./js/data.js"></script>
+<script src="./js/echarts.min.js"></script>
+<script src="./js/index.js"></script>
+</body>
+</html>
+<!--<div style="margin-top: 10px;width: 100%;display: flex;justify-content: flex-end;">-->
+<!--  <div>-->
+<!--    <span>共 10 条</span>-->
+<!--    <span class="prev">&lt;</span>-->
+<!--    <span class="page_item page_item_active">1</span>-->
+<!--    <span class="page_item">2</span>-->
+<!--    <span class="page_item">3</span>-->
+<!--    <span class="next">&gt;</span>-->
+<!--  </div>-->
+<!--</div>-->
