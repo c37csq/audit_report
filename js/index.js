@@ -18,27 +18,81 @@ var map = {
   2: 'low',
   3: 'health'
 };
-var pageConfig = {
-  start: 0,
-  current: 1,
-  pageSize: 5,
+var pageArr = [];
+// var pageConfig = {
+//   start: 0,
+//   current: 1,
+//   pageSize: 5,
+// }
+
+/**
+ * 分页函数
+ * @type {string}
+ */
+function createPage(data) {
+  var arr = [];
+  for (let i = 0; i < data.length; i ++) {
+    arr.push({
+      start: 0,
+      current: 1,
+      pageSize: 5,
+    })
+  }
+  return arr;
 }
 
+var status = '';
 /**
  * 绑定事件
  */
 function bindEvent() {
   clickArea[0].onclick = function () {
-    changeClickAreaStyle(0);
-    renderChart(data.high, 'high');
+    if (status === 'high') {
+      status = '';
+      renderChart(data.topData);
+      pageArr = createPage(data.report);
+      renderTable(data.report);
+      changeClickAreaStyle(-1);
+    } else {
+      changeClickAreaStyle(0);
+      renderChart(data.high, 'high');
+      pageArr = createPage(data.report);
+      renderTable(data.report_high);
+      status = 'high';
+    }
+    bindEvent();
   }
   clickArea[1].onclick = function () {
-    changeClickAreaStyle(1);
-    renderChart(data.middle, 'middle');
+    if (status === 'middle') {
+      status = '';
+      renderChart(data.topData);
+      pageArr = createPage(data.report);
+      renderTable(data.report);
+      changeClickAreaStyle(-1);
+    } else {
+      changeClickAreaStyle(1);
+      renderChart(data.middle, 'middle');
+      pageArr = createPage(data.report_middle);
+      renderTable(data.report_middle);
+      status = 'middle';
+    }
+    bindEvent();
   }
   clickArea[2].onclick = function () {
-    changeClickAreaStyle(2);
-    renderChart(data.low, 'low');
+    if (status === 'low') {
+      status = '';
+      renderChart(data.topData);
+      pageArr = createPage(data.report);
+      renderTable(data.report);
+      changeClickAreaStyle(-1);
+    } else {
+      changeClickAreaStyle(2);
+      renderChart(data.low, 'low');
+      pageArr = createPage(data.report_low);
+      renderTable(data.report_low);
+      status = 'low';
+    }
+    bindEvent();
   }
   var click_td = document.querySelectorAll('.click_td');
   for (let i = 0; i < click_td.length; i ++) {
@@ -51,14 +105,13 @@ function bindEvent() {
       }
     }
   }
-  var page_item = document.querySelectorAll('.page_item');
   var page_wrapper = document.querySelectorAll('.page_wrapper');
   for (let i = 0; i < page_wrapper.length; i ++) {
     page_wrapper[i].addEventListener('click', function (e) {
       if (e.target.className === 'page_item_active') {
         return;
       } else if (e.target.className === 'prev') {
-        if (pageConfig.current < 2) {
+        if (pageArr[i].current < 2) {
           return;
         }
         var arr = Array.from(page_wrapper[i].children[0].children);
@@ -66,25 +119,80 @@ function bindEvent() {
         for (let j = 0; j < page_items.length; j ++) {
           page_items[j].classList.remove('page_item_active');
         }
-        pageConfig.current = pageConfig.current - 1;
-        page_items[pageConfig.current - 1].classList.add('page_item_active');
-        pageConfig.start = ((pageConfig.current - 1) * pageConfig.pageSize);
-        var type = data.report[i].audit_type;
-        renderSmallTable(data.report, i, type, pageConfig.start, pageConfig.current * pageConfig.pageSize);
+        pageArr[i].current = pageArr[i].current - 1;
+        page_items[pageArr[i].current - 1].classList.add('page_item_active');
+        pageArr[i].start = ((pageArr[i].current - 1) * pageArr[i].pageSize);
+        if (status === '') {
+          var type = data.report[i].audit_type;
+          renderSmallTable(data.report, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'high') {
+          var type = data.report_high[i].audit_type;
+          renderSmallTable(data.report_high, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'middle') {
+          var type = data.report_middle[i].audit_type;
+          renderSmallTable(data.report_middle, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'low') {
+          var type = data.report_low[i].audit_type;
+          renderSmallTable(data.report_low, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        }
       } else if (e.target.className === 'next') {
-        if (pageConfig.current > Math.ceil(data.report[i].detail.length / pageConfig.pageSize) - 1) {
-          return;
+        if (status === '') {
+          if (pageArr[i].current > Math.ceil(data.report[i].detail.length / pageArr[i].pageSize) - 1) {
+            return;
+          }
+          var arr = Array.from(page_wrapper[i].children[0].children);
+          var page_items = arr.slice(2, arr.length - 1);
+          for (let j = 0; j < page_items.length; j ++) {
+            page_items[j].classList.remove('page_item_active');
+          }
+          pageArr[i].current = pageArr[i].current + 1;
+          page_items[pageArr[i].current - 1].classList.add('page_item_active');
+          pageArr[i].start = ((pageArr[i].current - 1) * pageArr[i].pageSize);
+          var type = data.report[i].audit_type;
+          renderSmallTable(data.report, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'high') {
+          if (pageArr[i].current > Math.ceil(data.report_high[i].detail.length / pageArr[i].pageSize) - 1) {
+            return;
+          }
+          var arr = Array.from(page_wrapper[i].children[0].children);
+          var page_items = arr.slice(2, arr.length - 1);
+          for (let j = 0; j < page_items.length; j ++) {
+            page_items[j].classList.remove('page_item_active');
+          }
+          pageArr[i].current = pageArr[i].current + 1;
+          page_items[pageArr[i].current - 1].classList.add('page_item_active');
+          pageArr[i].start = ((pageArr[i].current - 1) * pageArr[i].pageSize);
+          var type = data.report_high[i].audit_type;
+          renderSmallTable(data.report_high, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'middle') {
+          if (pageArr[i].current > Math.ceil(data.report_middle[i].detail.length / pageArr[i].pageSize) - 1) {
+            return;
+          }
+          var arr = Array.from(page_wrapper[i].children[0].children);
+          var page_items = arr.slice(2, arr.length - 1);
+          for (let j = 0; j < page_items.length; j ++) {
+            page_items[j].classList.remove('page_item_active');
+          }
+          pageArr[i].current = pageArr[i].current + 1;
+          page_items[pageArr[i].current - 1].classList.add('page_item_active');
+          pageArr[i].start = ((pageArr[i].current - 1) * pageArr[i].pageSize);
+          var type = data.report_middle[i].audit_type;
+          renderSmallTable(data.report_middle, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'low') {
+          if (pageArr[i].current > Math.ceil(data.report_low[i].detail.length / pageArr[i].pageSize) - 1) {
+            return;
+          }
+          var arr = Array.from(page_wrapper[i].children[0].children);
+          var page_items = arr.slice(2, arr.length - 1);
+          for (let j = 0; j < page_items.length; j ++) {
+            page_items[j].classList.remove('page_item_active');
+          }
+          pageArr[i].current = pageArr[i].current + 1;
+          page_items[pageArr[i].current - 1].classList.add('page_item_active');
+          pageArr[i].start = ((pageArr[i].current - 1) * pageArr[i].pageSize);
+          var type = data.report_low[i].audit_type;
+          renderSmallTable(data.report_low, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
         }
-        var arr = Array.from(page_wrapper[i].children[0].children);
-        var page_items = arr.slice(2, arr.length - 1);
-        for (let j = 0; j < page_items.length; j ++) {
-          page_items[j].classList.remove('page_item_active');
-        }
-        pageConfig.current = pageConfig.current + 1;
-        page_items[pageConfig.current - 1].classList.add('page_item_active');
-        pageConfig.start = ((pageConfig.current - 1) * pageConfig.pageSize);
-        var type = data.report[i].audit_type;
-        renderSmallTable(data.report, i, type, pageConfig.start, pageConfig.current * pageConfig.pageSize);
       } else if (e.target.className === 'page_item') {
         var arr = Array.from(page_wrapper[i].children[0].children);
         var page_items = arr.slice(2, arr.length - 1);
@@ -92,41 +200,24 @@ function bindEvent() {
           page_items[j].classList.remove('page_item_active');
         }
         e.target.classList.add('page_item_active');
-        pageConfig.start = (parseInt(e.target.innerText) - 1) * pageConfig.pageSize;
-        pageConfig.current = parseInt(e.target.innerText);
-        var type = data.report[i].audit_type;
-        renderSmallTable(data.report, i, type, pageConfig.start, pageConfig.current * pageConfig.pageSize);
+        pageArr[i].start = (parseInt(e.target.innerText) - 1) * pageArr[i].pageSize;
+        pageArr[i].current = parseInt(e.target.innerText);
+        if (status === '') {
+          var type = data.report[i].audit_type;
+          renderSmallTable(data.report, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'high') {
+          var type = data.report_high[i].audit_type;
+          renderSmallTable(data.report_high, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'middle') {
+          var type = data.report_middle[i].audit_type;
+          renderSmallTable(data.report_middle, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        } else if (status === 'low') {
+          var type = data.report_low[i].audit_type;
+          renderSmallTable(data.report_low, i, type, pageArr[i].start, pageArr[i].current * pageArr[i].pageSize);
+        }
       }
-      // else {
-      //   var arr = Array.from(page_wrapper[i].children[0].children);
-      //   var page_items = arr.slice(2, arr.length - 1);
-      //   for (let j = 0; j < page_items.length; j ++) {
-      //     page_items[j].classList.remove('page_item_active');
-      //   }
-      //   e.target.classList.add('page_item_active');
-      //   pageConfig.start = (parseInt(e.target.innerText) - 1) * pageConfig.pageSize;
-      //   pageConfig.current = parseInt(e.target.innerText);
-      //   var type = data.report[i].audit_type;
-      //   renderSmallTable(data.report, i, type, pageConfig.start, pageConfig.current * pageConfig.pageSize);
-      // }
     });
   }
-  // for (let i = 0; i < page_item.length; i ++) {
-  //   page_item[i].onclick = function (e) {
-  //     if (page_item[i].classList.contains('.page_item_active')) {
-  //       return;
-  //     } else {
-  //       console.log(e);
-  //       pageConfig.start = (parseInt(e.target.innerText) - 1) * pageConfig.pageSize;
-  //       pageConfig.current = parseInt(e.target.innerText);
-  //       for (let i = 0; i < page_item.length; i ++) {
-  //         page_item[i].classList.remove('page_item_active');
-  //       }
-  //       page_item[i].classList.add('page_item_active');
-  //       renderSmallTable(data.report, 0, 'SQL');
-  //     }
-  //   }
-  // }
 }
 
 /**
@@ -149,6 +240,14 @@ function changeImgStyle(index, flag) {
 }
 
 function changeClickAreaStyle(index) {
+  if (index === -1) {
+    for (var i = 0; i < clickAreaWrapper.length; i++) {
+      clickAreaWrapper[i].classList.remove('click_border_show');
+      clickAreaWrapper[i].classList.remove('click_border');
+    }
+    chartArea.classList.remove('chart_border_top_none');
+    return;
+  }
   for (var i = 0; i < clickAreaWrapper.length; i ++) {
     clickAreaWrapper[i].classList.remove('click_border_show');
     clickAreaWrapper[i].classList.remove('click_border');
@@ -205,53 +304,53 @@ function renderTopAreaData(info) {
 function renderSmallTable(info, index, type, start, end) {
   if (type === 'SQL') {
     var str = `<tr>
-                  <td>SQL_ID</td>
-                  <td>首次审核时间</td>
-                  <td>Schema</td>
-                  <td>SQL文本</td>
-                  <td width="360">违反规则</td>
-                  <td>审核评分</td>
+                  <td style="width: 157px;">SQL_ID</td>
+                  <td style="width: 130px;">首次审核时间</td>
+                  <td style="width: 170px;">Schema</td>
+                  <td style="width: 290px;">SQL文本</td>
+                  <td style="width: 360px">违反规则</td>
+                  <td style="width: 100px;">审核评分</td>
                 </tr>`;
     for (var j = 0; j < info[index].detail.slice(start, end).length; j ++) {
       str += `
                 <tr>
-                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[index].detail[j].sql_id}</a></td>
-                  <td width="150">${formatDate(info[index].detail[j].first_audit_time)}</td>
-                  <td width="180">${info[index].detail[j].schema}</td>
-                  <td><div title="${info[index].detail[j].sql_text}" style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info[index].detail[j].sql_text}</div></td>
+                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[index].detail.slice(start, end)[j].sql_id}</a></td>
+                  <td width="150">${formatDate(info[index].detail.slice(start, end)[j].first_audit_time)}</td>
+                  <td width="180">${info[index].detail.slice(start, end)[j].schema}</td>
+                  <td width="280"><div title="${info[index].detail.slice(start, end)[j].sql_text}" style="display: inline-block;width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info[index].detail.slice(start, end)[j].sql_text}</div></td>
                   <td style="width: 360px;">`;
-      for (var h = 0; h < info[index].detail[j].audit.length; h ++) {
-        str += `<div title="${info[index].detail[j].audit[h].description}" class="${classMap[info[index].detail[j].audit[h].risky]}">${info[index].detail[j].audit[h].name}</div>`
+      for (var h = 0; h < info[index].detail.slice(start, end)[j].audit.length; h ++) {
+        str += `<div title="${info[index].detail.slice(start, end)[j].audit[h].description}" style="display: inline-block;width: 100px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" class="${classMap[info[index].detail.slice(start, end)[j].audit[h].risky]}">${info[index].detail.slice(start, end)[j].audit[h].name}</div>`
       }
       str += `</td>
-                  <td width="100">${info[index].detail[j].score}</td>
+                  <td width="100">${info[index].detail.slice(start, end)[j].score}</td>
                   </tr>`;
     }
     document.querySelectorAll('.table_two')[index].innerHTML = str;
   } else if (type === 'OBJECT') {
     var obj_str = `<tr>
-                  <td>对象名</td>
-                  <td>类型</td>
-                  <td>表名</td>
-                  <td>Schema</td>
-                  <td width="360">审核规则</td>
-                  <td>最近一次审核时间</td>
-                  <td>审核评分</td>
+                  <td style="width: 157px;">对象名</td>
+                  <td style="width: 60px;">类型</td>
+                  <td style="width: 157px;">表名</td>
+                  <td style="width: 170px;">Schema</td>
+                  <td style="width: 360px;">审核规则</td>
+                  <td style="width: 130px;">最近一次审核时间</td>
+                  <td style="width: 100px;">审核评分</td>
                 </tr>`;
-    for (var j = 0; j < info[index].detail.slice(pageConfig.start, pageConfig.current * pageConfig.pageSize).length; j ++) {
+    for (var j = 0; j < info[index].detail.slice(start, end).length; j ++) {
       obj_str += `
                 <tr>
-                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[index].detail[j].name}</a></td>
-                  <td width="150">${typeMap[info[index].detail[j].type]}</td>
-                  <td width="180">${info[index].detail[j].table_name}</td>
-                  <td><div style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info[index].detail[j].schema}</div></td>
+                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[index].detail.slice(start, end)[j].name}</a></td>
+                  <td width="150">${typeMap[info[index].detail.slice(start, end)[j].type]}</td>
+                  <td width="180">${info[index].detail.slice(start, end)[j].table_name}</td>
+                  <td><div style="width: 180px !important;">${info[index].detail.slice(start, end)[j].schema}</div></td>
                   <td style="width: 360px;">`;
-      for (var h = 0; h < info[index].detail[j].audit.length; h ++) {
-        obj_str += `<div title="${info[index].detail[j].audit[h].description}" class="${classMap[info[index].detail[j].audit[h].risky]}">${info[index].detail[j].audit[h].name}</div>`
+      for (var h = 0; h < info[index].detail.slice(start, end)[j].audit.length; h ++) {
+        obj_str += `<div title="${info[index].detail.slice(start, end)[j].audit[h].name}" class="${classMap[info[index].detail.slice(start, end)[j].audit[h].risky]}">${info[index].detail.slice(start, end)[j].audit[h].name}</div>`
       }
       obj_str += `</td>
-                  <td>${formatDate(info[index].detail[j].current_audit_time)}</td>
-                  <td width="100">${info[index].detail[j].score}</td><tr/>`;
+                  <td>${formatDate(info[index].detail.slice(start, end)[j].current_audit_time)}</td>
+                  <td width="100">${info[index].detail.slice(start, end)[j].score}</td><tr/>`;
     }
     document.querySelectorAll('.table_two')[index].innerHTML = obj_str;
   }
@@ -288,14 +387,19 @@ var typeMap = {
   'TABLE': '表',
   'SEQUENCE': '序列',
 }
+
+/**
+ * 渲染表格数据
+ * @param info
+ */
 function renderTable(info) {
   var initStr = `<tr style="background: #f8f8f9;">
-            <td width="60">序号</td>
-            <td width="300">风险项名称</td>
-            <td width="140">规则类别</td>
-            <td width="640">问题描述</td>
-            <td width="100">命中个数</td>
-            <td width="100">影响SQL占比</td>
+            <td style="width: 50px">序号</td>
+            <td style="width: 300px">风险项名称</td>
+            <td style="width: 140px">规则类别</td>
+            <td style="width: 600px">问题描述</td>
+            <td style="width: 80px">命中个数</td>
+            <td style="width: 80px">影响SQL占比</td>
           </tr>`;
   for(var i = 0; i < info.length; i ++) {
     var trStr = `
@@ -311,15 +415,15 @@ function renderTable(info) {
             <td colspan="6" style="width: 100%;padding: 18px 35px;">
               <table class="table_one" style="width: 100%;border-collapse:collapse;">
                 <tr>
-                  <td style="font-weight: normal;">问题描述</td>
-                  <td style="font-weight: normal;" title="${info[i].description}">${info[i].description}</td>
+                  <td style="font-weight: normal;width: 100px;">问题描述</td>
+                  <td style="font-weight: normal;width: 1125px;" title="${info[i].description}">${info[i].description}</td>
                 </tr>
                 <tr>
-                  <td>解决建议</td>
+                  <td style="width: 100px;">解决建议</td>
                   <td>${info[i].advice}</td>
                 </tr>
                 <tr>
-                  <td>wiki链接</td>
+                  <td style="width: 100px;">wiki链接</td>
                   <td>
                     <a style="color: rgb(0, 145, 255);cursor: pointer;">${info[i].name}</a>
                   </td>
@@ -332,26 +436,26 @@ function renderTable(info) {
               cellspacing="0"
               cellpadding="0">
                 <tr>
-                  <td>SQL_ID</td>
-                  <td>首次审核时间</td>
-                  <td>Schema</td>
-                  <td>SQL文本</td>
-                  <td width="360">违反规则</td>
-                  <td>审核评分</td>
+                  <td style="width: 157px;">SQL_ID</td>
+                  <td style="width: 130px;">首次审核时间</td>
+                  <td style="width: 170px;">Schema</td>
+                  <td style="width: 290px;">SQL文本</td>
+                  <td style="width: 360px">违反规则</td>
+                  <td style="width: 100px;">审核评分</td>
                 </tr>`;
-      for (var j = 0; j < info[i].detail.slice(pageConfig.start, pageConfig.current * pageConfig.pageSize).length; j ++) {
+      for (var j = 0; j < info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize).length; j ++) {
       tabStr += `
                 <tr>
-                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[i].detail[j].sql_id}</a></td>
-                  <td width="150">${formatDate(info[i].detail[j].first_audit_time)}</td>
-                  <td width="180">${info[i].detail[j].schema}</td>
-                  <td><div title="${info[i].detail[j].sql_text}" style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info[i].detail[j].sql_text}</div></td>
+                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].sql_id}</a></td>
+                  <td width="150">${formatDate(info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].first_audit_time)}</td>
+                  <td width="180">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].schema}</td>
+                  <td style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span title="${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].sql_text}" style="display: inline-block;width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].sql_text}</span></td>
                   <td style="width: 360px;">`;
-        for (var h = 0; h < info[i].detail[j].audit.length; h ++) {
-        tabStr += `<div title="${info[i].detail[j].audit[h].description}" class="${classMap[info[i].detail[j].audit[h].risky]}">${info[i].detail[j].audit[h].name}</div>`
+        for (var h = 0; h < info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].audit.length; h ++) {
+        tabStr += `<div title="${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].audit[h].description}" class="${classMap[info[i].detail[j].audit[h].risky]}">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].audit[h].name}</div>`
       }
         tabStr += `</td>
-                  <td width="100">${info[i].detail[j].score}</td></tr>`;
+                  <td width="100">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].score}</td></tr>`;
       }
       tabStr += `</table>`;
       var pageStr = `
@@ -359,7 +463,7 @@ function renderTable(info) {
         <div>
             <span>共 ${info[i].detail.length} 条</span>
             <span class="prev">&lt;</span>`;
-      for (var p = 0; p < Math.ceil(info[i].detail.length / pageConfig.pageSize); p++) {
+      for (var p = 0; p < Math.ceil(info[i].detail.length / pageArr[i].pageSize); p++) {
         if (p === 0) {
           pageStr += `<span class="page_item page_item_active">${p + 1}</span>`;
         } else {
@@ -384,28 +488,28 @@ function renderTable(info) {
               cellspacing="0"
               cellpadding="0">
                 <tr>
-                  <td>对象名</td>
-                  <td>类型</td>
-                  <td>表名</td>
-                  <td>Schema</td>
-                  <td width="360">审核规则</td>
-                  <td>最近一次审核时间</td>
-                  <td>审核评分</td>
+                  <td style="width: 157px;">对象名</td>
+                  <td style="width: 60px;">类型</td>
+                  <td style="width: 157px;">表名</td>
+                  <td style="width: 157px;">Schema</td>
+                  <td style="width: 360px;">审核规则</td>
+                  <td style="width: 130px;">最近一次审核时间</td>
+                  <td style="width: 157px;">审核评分</td>
                 </tr>`;
-      for (var j = 0; j < info[i].detail.slice(pageConfig.start, pageConfig.current * pageConfig.pageSize).length; j ++) {
+      for (var j = 0; j < info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize).length; j ++) {
         tab_str += `
                 <tr>
-                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[i].detail[j].name}</a></td>
-                  <td width="150">${typeMap[info[i].detail[j].type]}</td>
-                  <td width="180">${info[i].detail[j].table_name}</td>
-                  <td><div style="width: 280px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info[i].detail[j].schema}</div></td>
+                  <td><a style="width: 130px;color: rgb(0, 145, 255);cursor: pointer;">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].name}</a></td>
+                  <td style="width: 150px;">${typeMap[info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].type]}</td>
+                  <td style="width: 180px;">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].table_name}</td>
+                  <td style="width: 150px;"><div style="text-align: center;width: 150px !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].schema}</div></td>
                   <td style="width: 360px;">`;
-        for (var h = 0; h < info[i].detail[j].audit.length; h ++) {
-          tab_str += `<div title="${info[i].detail[j].audit[h].description}" class="${classMap[info[i].detail[j].audit[h].risky]}">${info[i].detail[j].audit[h].name}</div>`
+        for (var h = 0; h < info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].audit.length; h ++) {
+          tab_str += `<div title="${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].audit[h].description}" class="${classMap[info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].audit[h].risky]}">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].audit[h].name}</div>`
         }
         tab_str += `</td>
-                  <td>${formatDate(info[i].detail[j].current_audit_time)}</td>
-                  <td width="100">${info[i].detail[j].score}</td></tr>`;
+                  <td>${formatDate(info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].current_audit_time)}</td>
+                  <td width="100">${info[i].detail.slice(pageArr[i].start, pageArr[i].current * pageArr[i].pageSize)[j].score}</td></tr>`;
       }
       tab_str += `</table>`;
       var pageStr = `
@@ -413,7 +517,7 @@ function renderTable(info) {
         <div>
             <span>共 ${info[i].detail.length} 条</span>
             <span class="prev">&lt;</span>`;
-      for (var p = 0; p < Math.ceil(info[i].detail.length / pageConfig.pageSize); p++) {
+      for (var p = 0; p < Math.ceil(info[i].detail.length / pageArr[i].pageSize); p++) {
         if (p === 0) {
           pageStr += `<span class="page_item page_item_active">${p + 1}</span>`;
         } else {
@@ -449,7 +553,8 @@ function dealSQL_OBJ_TOP(info) {
  */
 function dealRisk_TOP(info) {
   var arr = [];
-  var data = info.reverse().slice(0, 5);
+  // var data = info.reverse().slice(0, 5);
+  var data = info.slice(0, 5);
   for (var i = 0; i < data.length; i++) {
     arr.push([data[i].count, data[i].name, data[i].risky]);
   }
@@ -514,14 +619,6 @@ function createDom(pDom, dom, text, prop) {
 }
 
 /**
- * 处理图表数据函数
- */
-function renderChartData() {
-
-}
-
-
-/**
  * 渲染图表数据
  */
 function renderChart(info, level) {
@@ -546,10 +643,10 @@ function renderChart(info, level) {
  * 初始化函数
  */
 function init() {
+  pageArr = createPage(data.report);
   var topInfo = data.topData.info;
   renderCenterAreaData(data.clickAreaData);
   renderTable(data.report);
-  console.log(data);
   renderChart(data.topData);
   renderTopAreaData(topInfo);
   bindEvent();

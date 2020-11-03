@@ -161,6 +161,7 @@
     padding: 15px 0 15px 15px;
     font-size: 12px;
     text-align: center;
+    width: 280px;
     color: #515a6e;
     white-space:nowrap;
     overflow:hidden;
@@ -242,8 +243,12 @@
   .page_item_active {
     color: #2D8CF2;
   }
+  table {
+    table-layout:fixed;
+  }
 </style>
 </head>
+<body>
   <div style="padding: 0 15px 15px 15px;">
     <header>
       <h1></h1>
@@ -573,19 +578,9 @@
       </div>
     </div>
   </div>
-<body>
 <script src="./js/data.js"></script>
 <script src="./js/echarts.min.js"></script>
 <script src="./js/index.js"></script>
 </body>
 </html>
-<!--<div style="margin-top: 10px;width: 100%;display: flex;justify-content: flex-end;">-->
-<!--  <div>-->
-<!--    <span>共 10 条</span>-->
-<!--    <span class="prev">&lt;</span>-->
-<!--    <span class="page_item page_item_active">1</span>-->
-<!--    <span class="page_item">2</span>-->
-<!--    <span class="page_item">3</span>-->
-<!--    <span class="next">&gt;</span>-->
-<!--  </div>-->
-<!--</div>-->
+
