@@ -12,6 +12,7 @@ var sql_problem = document.querySelector('.sql_problem');
 var sql_total = document.querySelector('.sql_total');
 var object_score = document.querySelector('.object_score');
 var object_nums = document.querySelector('.object_nums');
+var title_risk = document.querySelector('.title_risk');
 var map = {
   0: 'high',
   1: 'middle',
@@ -52,11 +53,13 @@ function bindEvent() {
   clickArea[0].onclick = function () {
     if (status === 'high') {
       status = '';
+      title_risk.innerText = '全部风险规则命中';
       renderChart(data.topData);
       pageArr = createPage(data.report);
       renderTable(data.report);
       changeClickAreaStyle(-1);
     } else {
+      title_risk.innerText = '高危风险规则命中';
       changeClickAreaStyle(0);
       renderChart(data.high, 'high');
       pageArr = createPage(data.report);
@@ -68,11 +71,13 @@ function bindEvent() {
   clickArea[1].onclick = function () {
     if (status === 'middle') {
       status = '';
+      title_risk.innerText = '全部风险规则命中';
       renderChart(data.topData);
       pageArr = createPage(data.report);
       renderTable(data.report);
       changeClickAreaStyle(-1);
     } else {
+      title_risk.innerText = '警告风险规则命中';
       changeClickAreaStyle(1);
       renderChart(data.middle, 'middle');
       pageArr = createPage(data.report_middle);
@@ -84,11 +89,13 @@ function bindEvent() {
   clickArea[2].onclick = function () {
     if (status === 'low') {
       status = '';
+      title_risk.innerText = '全部风险规则命中';
       renderChart(data.topData);
       pageArr = createPage(data.report);
       renderTable(data.report);
       changeClickAreaStyle(-1);
     } else {
+      title_risk.innerText = '提示风险规则命中';
       changeClickAreaStyle(2);
       renderChart(data.low, 'low');
       pageArr = createPage(data.report_low);
