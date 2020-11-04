@@ -18,6 +18,9 @@ var map = {
   2: 'low',
   3: 'health'
 };
+data.report_high = data.report.filter(item => item.risky === 'high');
+data.report_middle = data.report.filter(item => item.risky === 'middle');
+data.report_low = data.report.filter(item => item.risky === 'low');
 var pageArr = [];
 // var pageConfig = {
 //   start: 0,

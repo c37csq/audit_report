@@ -4900,8 +4900,6 @@ var data = {
         },
       ]
     },
-  ],
-  report_high: [
     {
       "report_id": 12215,
       "name": "存在隐式类型转换",
@@ -5052,7 +5050,8 @@ var data = {
         }],
         "db_name": "oracle_test_1"
       }],
-    }, {
+    },
+    {
       "report_id": 12215,
       "name": "索引状态异常",
       "description": "索引为invisible或unusable",
@@ -5287,8 +5286,7 @@ var data = {
         }],
         "db_name": "oracle_test_1"
       }],
-    }],
-  report_middle: [
+    },
     {
       "report_id": 6376,
       "name": "索引列过多",
@@ -10984,8 +10982,7 @@ var data = {
         }],
         "db_name": "oracle_test_1"
       }],
-    }],
-  report_low: [
+    },
     {
       "report_id": 6376,
       "name": "sql 使用hint",
@@ -11421,7 +11418,8 @@ var data = {
         "db_name": "oracle_test_1",
         "file": ""
       }],
-    }, {
+    },
+    {
       "report_id": 6376,
       "name": "主键未命名",
       "description": "主键没有命名(使用SYS_C开头系统命名)",
@@ -12279,7 +12277,8 @@ var data = {
         }],
         "db_name": "oracle_test_1"
       }],
-    }, {
+    },
+    {
       "report_id": 6376,
       "name": "使用了外键",
       "description": "存在外键约束时，当对主表的记录进行update或delete时，为了校验从表上是否存在依赖该记录的数据。",
@@ -12625,7 +12624,11 @@ var data = {
         }],
         "db_name": "oracle_test_1"
       }],
-    }],
+    }
+  ],
+  report_high: [],
+  report_middle: [],
+  report_low: [],
   low: {
     "info": {
       "id": 8758,
